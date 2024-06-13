@@ -1,68 +1,77 @@
 #include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 #include <stdbool.h>
+
 #include "StackArray.h"
 
-void initStack(StackArrayList *s){
-	s->top = -1;
+void startStack(StackArrayList *s) {
+    s->top = -1;
 }
 
-bool isEmpty(StackArrayList *s){
-	return s->top == -1;
+StackArrayList formStack() {
+    StackArrayList s;
+    startStack(&s);
+    return s;
 }
 
-bool isFull(StackArrayList *s){
-	return s->top == MAX - 1;
+bool checkEmpty(StackArrayList *s) {
+    return s->top == -1;
 }
 
-void push (StackArrayList *s, Data value){
-	if(isFull(s)) {
-		printf("Stack Full\n");
-		return;
-	}
-	s->elem[++(s->top)] = value;
+bool checkFull(StackArrayList *s) {
+    return s->top == MAX - 1;
 }
 
-void pop(StackArrayList *s){
-	if(isEmpty(s)){
-		printf("Stack Empty\n");
-		return;
-	}
-	s->top--;
+bool addElement(StackArrayList *s, int value) {
+    if (checkFull(s)) {
+        printf("Stack Overflow.\n");
+        return false;
+    }
+    s->data[++s->top] = value;
+    return true;
 }
 
-Data peek(StackArrayList *s){
-	if(isEmpty(s)){
-		printf("Stack Empty\n");
-		return;
-	}
-	return s->elem[s->top];
+bool removeElement(StackArrayList *s) {
+    if (checkEmpty(s)) {
+        printf("Stack Underflow.\n");
+        return false;
+    }
+    s->top--;
+    return true;
 }
 
-void display(StackArrayList *s){
-	StackArrayList newStack;
-	initStack(&newStack);
-	
-	while(!isEmpty(s)){
-		push(&newStack, peek(s));
-		pop(s);
-	}
-	while(!isEmpty(&newStack)){
-		printf("%d ", peek(&newStack));
-		pop(&newStack);
-	}
-	printf("\n");
+int peekTop(StackArrayList s) {
+    if (checkEmpty(&s)) {
+        printf("Stack is Empty.\n");
+        return -1;
+    }
+    return s.data[s.top];
 }
 
-void visualize(StackArrayList *s){
-	if (isEmpty(s)){
-		printf("Stack Empty\n");
-		return;
-	}
-	
-	Data i;
-	printf("Stack: ");
-	for(i = s->top; i >= 0; i--){
-		printf("%d ", s->elem[i]);
-	}
-	printf("\n");
+void printStack(StackArrayList s) {
+    StackArrayList newStack;
+    startStack(&newStack);
+    while (!checkEmpty(&s)) {
+        addElement(&newStack, peekTop(s));
+        removeElement(&s);
+    }
+    while (!checkEmpty(&newStack)) {
+        printf("%d \n", peekTop(newStack));
+        removeElement(&newStack);
+    }
+    printf("\n");
+}
+
+void viewStack(StackArrayList s) {
+    if (checkEmpty(&s)) {
+        printf("Stack is Empty.\n");
+    }
+    for (int i = s.top; i >= 0; i--) {
+        printf("%d %d", s.data[i], i);
+        if (s.data[i] != s.top) {
+            printf("%4s \n", " <-- top");
+        }
+    }
+    printf("\n");
 }

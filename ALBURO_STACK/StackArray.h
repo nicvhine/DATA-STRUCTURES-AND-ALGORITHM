@@ -1,22 +1,26 @@
 #ifndef STACK_ARRAY
 #define STACK_ARRAY
 
-#define MAX 20
+#include <stdbool.h>
 
-typedef int Data;
+#define MAX 10
 
-typedef struct{
-	Data elem[MAX];
-	int top;
-}StackArrayList;
+typedef struct {
+    int data[MAX];
+    int top;
+} StackArrayList;
 
-void initStack(StackArrayList *s);
-bool isEmpty(StackArrayList *s);
-bool isFull(StackArrayList *s);
-void push(StackArrayList *s, Data value);
-void pop(StackArrayList *s);
-Data peek(StackArrayList *s);
-void display(StackArrayList *s);
-void visualize(StackArrayList *s);
+void startStack(StackArrayList *s);
+StackArrayList formStack();
+
+bool checkEmpty(StackArrayList *s);
+bool checkFull(StackArrayList *s);
+
+bool addElement(StackArrayList *s, int value);
+bool removeElement(StackArrayList *s);
+int peekTop(StackArrayList s);
+
+void printStack(StackArrayList s);
+void viewStack(StackArrayList s);
 
 #endif

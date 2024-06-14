@@ -11,7 +11,6 @@ typedef struct {
 } StackArrayList;
 
 void startStack(StackArrayList *s);
-StackArrayList formStack();
 
 bool checkEmpty(StackArrayList *s);
 bool checkFull(StackArrayList *s);
@@ -22,5 +21,7 @@ int peekTop(StackArrayList s);
 
 void printStack(StackArrayList s);
 void viewStack(StackArrayList s);
+void removeEvenNumbers(StackArrayList *s);
 
 #endif
+

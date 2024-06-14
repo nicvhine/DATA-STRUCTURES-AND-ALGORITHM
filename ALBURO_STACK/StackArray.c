@@ -9,12 +9,6 @@ void startStack(StackArrayList *s) {
     s->top = -1;
 }
 
-StackArrayList formStack() {
-    StackArrayList s;
-    startStack(&s);
-    return s;
-}
-
 bool checkEmpty(StackArrayList *s) {
     return s->top == -1;
 }
@@ -50,15 +44,13 @@ int peekTop(StackArrayList s) {
 }
 
 void printStack(StackArrayList s) {
-    StackArrayList newStack;
-    startStack(&newStack);
-    while (!checkEmpty(&s)) {
-        addElement(&newStack, peekTop(s));
-        removeElement(&s);
+    if (checkEmpty(&s)) {
+        printf("Stack is Empty.\n");
+        return;
     }
-    while (!checkEmpty(&newStack)) {
-        printf("%d \n", peekTop(newStack));
-        removeElement(&newStack);
+    printf("Top: ");
+    for (int i = s.top; i >= 0; i--) {
+        printf("%d ", s.data[i]);
     }
     printf("\n");
 }
@@ -66,12 +58,29 @@ void printStack(StackArrayList s) {
 void viewStack(StackArrayList s) {
     if (checkEmpty(&s)) {
         printf("Stack is Empty.\n");
+        return;
     }
+    
     for (int i = s.top; i >= 0; i--) {
-        printf("%d %d", s.data[i], i);
-        if (s.data[i] != s.top) {
-            printf("%4s \n", " <-- top");
-        }
+        printf("%d <--- %d\n", s.data[i], i);
     }
     printf("\n");
 }
+
+
+void removeEvenNumbers(StackArrayList *s) {
+    StackArrayList tempStack;
+    startStack(&tempStack);
+    while (!checkEmpty(s)) {
+        int num = peekTop(*s);
+        removeElement(s);
+        if (num % 2 != 0) {
+            addElement(&tempStack, num);
+        }
+    }
+    while (!checkEmpty(&tempStack)) {
+        addElement(s, peekTop(tempStack));
+        removeElement(&tempStack);
+    }
+}
+

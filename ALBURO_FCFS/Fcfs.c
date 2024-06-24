@@ -17,7 +17,7 @@ void populateFCFS(FCFSQueue *q) {
     int input, i;
     Process p;
 
-    printf("Enter number of process: ");
+    printf("Enter number of processes: ");
     scanf("%d", &input);
     printf("\n");
 
@@ -38,118 +38,100 @@ void populateFCFS(FCFSQueue *q) {
 
 void arrange(FCFSQueue *q) {
     FCFSQueue temp = create();
-    ProcessNodePtr check, front;
-    
     while (!isEmpty(*q)) {
-        check = first(*q);
-        front = check;
-        
-        if (front == NULL || check->p.at < front->p.at) {
-            enqueue(&temp, check->p);
-            dequeue(q);
-        } else {
-            enqueue(q, check->p);
-            dequeue(q);
-        }
+        ProcessNodePtr check = first(*q);
+        enqueue(&temp, check->p);
+        dequeue(q);
     }
-    
     *q = temp;
 }
 
+
 bool enqueue(FCFSQueue *q, Process p) {
-    bool res = false;
     ProcessNodePtr temp = (ProcessNodePtr)malloc(sizeof(ProcessNode));
     
-    if (temp != NULL) {
-        temp->p = p;
-        temp->next = NULL;
-        
-        if (isEmpty(*q)) {
-            q->first = q->last = temp;
-        } else {
-            q->last->next = temp;
-            q->last = temp;
-        }
-        
-        res = true;
+    if (temp == NULL) {
+    fprintf(stderr, "Error: Memory allocation failed\n");
+    return false; 
+}
+    
+    temp->p = p;
+    temp->next = NULL;
+    
+    if (isEmpty(*q)) {
+        q->first = q->last = temp;
+    } else {
+        q->last->next = temp;
+        q->last = temp;
     }
     
-    return res;
+    return true;
 }
 
 bool dequeue(FCFSQueue *q) {
-    bool res = false;
-    ProcessNodePtr temp;
-    
-    if (!isEmpty(*q)) {
-        temp = q->first;
-        q->first = temp->next;
-        free(temp);
-        
-        if (q->first == NULL) {
-            q->last = NULL;
-        }
-        
-        res = true;
+    if (isEmpty(*q)) {
+        return false;
     }
     
-    return res;
+    ProcessNodePtr temp = q->first;
+    q->first = q->first->next;
+    
+    if (q->first == NULL) {
+        q->last = NULL;
+    }
+    
+    free(temp);
+    return true;
 }
 
 ProcessNodePtr first(FCFSQueue q) {
-    return (!isEmpty(q)) ? q.first : NULL;
+    return q.first;
 }
 
 ProcessNodePtr last(FCFSQueue q) {
-    return (!isEmpty(q)) ? q.last : NULL;
+    return q.last;
 }
 
 bool isEmpty(FCFSQueue q) {
-    return (q.first == NULL && q.last == NULL);
+    return q.first == NULL && q.last == NULL;
 }
 
 void displayFCFS(FCFSQueue q) {
-    if (!isEmpty(q)) {
-        printf("FCFS Queue Visualization\n");
-        printf("+------------+------------+--------------+----------------+--------------+-----------------+\n");
-        printf("| Process ID | Burst Time | Arrival Time | Execution Time | Waiting Time | Turnaround Time |\n");
-        printf("+------------+------------+--------------+----------------+--------------+-----------------+\n");
-
-        int count = 0, ct = 0, et, wt, tt, wtTotal = 0, ttTotal = 0;
-        ProcessNodePtr temp = q.first;
-
-        while (temp != NULL) {
-            Process p = temp->p;
-
-            if (ct < p.at) {
-                ct = p.at;
-            }
-
-            wt = ct - p.at;
-            et = ct;
-            tt = et + p.bt;
-            ct += p.bt;
-
-            wtTotal += wt;
-            ttTotal += tt;
-
-            printf("| %-10c | %-10d | %-12d | %-14d | %-12d | %-15d |\n", p.p,
-                   p.bt,
-                   p.at,
-                   et,
-                   wt,
-                   tt);
-
-            temp = temp->next;
-            count++;
-        }
-
-        printf("+------------+------------+--------------+----------------+--------------+-----------------+\n");
-        printf("| %-10s | %-10s | %-12s | %-14s | %-12d | %-15d |\n", "", "", "", "Total ", wtTotal, ttTotal);
-        printf("| %-10s | %-10s | %-12s | %-14s | %-12.2f | %-15.2f |\n", "", "", "", "Average ", (float)wtTotal / count, (float)ttTotal / count);
-        printf("+------------+------------+--------------+----------------+--------------+-----------------+\n");
-    } else {
-        printf("FCFS is Empty!\n");
+    if (isEmpty(q)) {
+        printf("FCFS Queue is Empty!\n");
+        return;
     }
-}
 
+    printf("╔════════════╦════════════╦═══════════════╦═════════════════╦══════════════╦═════════════════╗\n");
+
+    printf("║ Process ID ║ Burst Time ║ Arrival Time  ║ Completion Time ║ Waiting Time ║ Turnaround Time ║\n");
+
+    printf("╠════════════╬════════════╬═══════════════╬═════════════════╬══════════════╬═════════════════╣\n");
+
+    int wtTotal = 0, ttTotal = 0, count = 0;
+    int ct = 0, wt, tt;
+    ProcessNode *temp = q.first;
+
+    while (temp != NULL) {
+        Process p = temp->p;
+
+        int completionTime = ct + p.bt;
+        wt = ct - p.at;
+        tt = completionTime - p.at;
+
+        wtTotal += wt;
+        ttTotal += tt;
+
+        printf("║     %c      ║     %2d     ║      %2d       ║       %2d        ║      %2d      ║       %2d        ║\n",
+               p.p, p.bt, p.at, completionTime, wt, tt);
+
+        ct = completionTime;
+        temp = temp->next;
+        count++;
+    }
+
+    printf("╚════════════╩════════════╩═══════════════╩═════════════════╩══════════════╩═════════════════╝\n");
+
+    printf("                                  Total                           %2d                %2d\n", wtTotal, ttTotal);
+    printf("                                  Average                         %.2f             %.2f\n", (float) wtTotal / count, (float) ttTotal / count);
+}
